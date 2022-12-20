@@ -31,11 +31,16 @@ public class PersonController {
     }
 
     @GetMapping("/{id}")
-    public Person findById(@PathVariable int id) {
-        return persons.findById(id)
+    public ResponseEntity<Person> findById(@PathVariable int id) {
+        var person = persons.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Person is not found. Please, check login"
                         ));
+        var entity = new ResponseEntity<>(
+                person,
+                HttpStatus.OK
+        );
+        return entity;
     }
 
     @PostMapping("/")
