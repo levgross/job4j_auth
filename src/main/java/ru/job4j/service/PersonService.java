@@ -29,6 +29,10 @@ public class PersonService implements UserDetailsService {
         return personRepository.findById(id);
     }
 
+    public Optional<Person> findByLogin(String login) {
+        return personRepository.findByLogin(login);
+    }
+
     public Person create(Person person) {
         person.setPassword(encoder.encode(person.getPassword()));
         return personRepository.save(person);
@@ -53,10 +57,10 @@ public class PersonService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Person person = personRepository.findByLogin(username);
-        if (person == null) {
+        Optional<Person> person = personRepository.findByLogin(username);
+        if (person.isEmpty()) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(person.getLogin(), person.getPassword(), emptyList());
+        return new User(person.get().getLogin(), person.get().getPassword(), emptyList());
     }
 }

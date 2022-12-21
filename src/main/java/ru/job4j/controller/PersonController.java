@@ -36,11 +36,9 @@ public class PersonController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Person is not found. Please, check login"
                         ));
-        var entity = new ResponseEntity<>(
+        return new ResponseEntity<>(
                 person,
-                HttpStatus.OK
-        );
-        return entity;
+                HttpStatus.OK);
     }
 
     @PostMapping("/")
@@ -54,12 +52,16 @@ public class PersonController {
         );
     }
 
-    @PutMapping("/")
-    public ResponseEntity<Void> update(@RequestBody Person person) {
-        if (!persons.update(person)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No person found for update!");
+    @PatchMapping("/")
+    public Person updatePassword(@RequestBody Person person) {
+        var personOpt = persons.findByLogin(person.getLogin());
+        if (personOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No person found for update! Check login.");
         }
-        return ResponseEntity.ok().build();
+        if (!persons.update(person)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No person found for update! Check id.");
+        }
+        return person;
     }
 
     @DeleteMapping("/{id}")
